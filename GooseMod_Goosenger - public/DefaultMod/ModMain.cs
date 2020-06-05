@@ -63,7 +63,7 @@ namespace GooseMessaging
                         if (!String.IsNullOrWhiteSpace(input))
                         {
                             XmlDocument document = new XmlDocument();
-                            document.Load("php submit url goes here" + System.Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(input)));
+                            document.Load("Url here" + System.Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(input)));
                             string webData = document.InnerText;
                             if (webData == "saved")
                             {
@@ -73,7 +73,7 @@ namespace GooseMessaging
                                 if (dialogResult == DialogResult.Yes)
                                 {
                                     XmlDocument document1 = new XmlDocument();
-                                    document1.Load("php retrive url goes here");
+                                    document1.Load("Url Here");
                                     string webData1 = document1.InnerText;
                                     MessageBox.Show(System.Text.ASCIIEncoding.ASCII.GetString(System.Convert.FromBase64String(webData1)), "Message From Other Geese");
                                 }
@@ -91,12 +91,25 @@ namespace GooseMessaging
                 else
                 {
                     new Thread(() => {
-                        var messages = new JavaScriptSerializer().Deserialize<List<string>>(File.ReadAllText(Path.Combine(API.Helper.getModDirectory(this), "messages.json")));
-                        MessageBox.Show("Unable to contact Goose Mail, here is a sample message\n\n" + messages[new Random().Next(messages.Count)], "A premade message");
+                        var files = Directory.GetFiles(Path.Combine(API.Helper.getModDirectory(this), "offlineMessages"), "*.txt");
+                        var message = File.ReadAllText(files[new Random().Next(files.Length)]);
+                        MessageBox.Show("Unable to contact Goose Mail, here is a sample message\n\n" + message, "A premade message");
                     }).Start();
                 }
             }
-            else if (GetAsyncKeyState(Keys.F9) == 0)
+
+            if ((GetAsyncKeyState(Keys.F10) != 0) && !failsafe)
+            {
+                failsafe = true;
+                new Thread(() => {
+                    var files = Directory.GetFiles(Path.Combine(API.Helper.getModDirectory(this), "offlineMessages"), "*.txt");
+                    var message = File.ReadAllText(files[new Random().Next(files.Length)]);
+                    MessageBox.Show("Here is a premade message:\n\n" + message, "A premade message");
+                }).Start();
+            }
+            
+            
+            if (GetAsyncKeyState(Keys.F10) == 0 && GetAsyncKeyState(Keys.F9) == 0)
             {
                 failsafe = false;
             }
